@@ -46,12 +46,16 @@ function LoginContent() {
             >
               <p className="text-sm text-red-800 dark:text-red-200 text-center">
                 {error === 'OAuthSignin'
-                  ? 'Error starting GitHub sign in'
+                  ? 'Error starting GitHub sign in - check GITHUB_CLIENT_ID'
                   : error === 'OAuthCallback'
-                  ? 'Error during GitHub callback'
+                  ? 'Error during GitHub callback - check callback URL or database connection'
                   : error === 'OAuthAccountNotLinked'
                   ? 'Account already exists with different provider'
-                  : 'An error occurred during sign in'}
+                  : error === 'AccessDenied'
+                  ? 'Access denied - check GitHub OAuth app permissions'
+                  : error === 'Configuration'
+                  ? 'Server configuration error - check environment variables'
+                  : `Auth error: ${error}`}
               </p>
             </div>
           )}
