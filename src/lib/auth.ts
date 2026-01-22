@@ -4,10 +4,16 @@ import connectDB from './db';
 import User from '@/models/User';
 
 export const authOptions: NextAuthOptions = {
+  debug: process.env.NODE_ENV === 'development',
   providers: [
     GithubProvider({
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          scope: 'read:user user:email',
+        },
+      },
     }),
   ],
   callbacks: {
@@ -42,7 +48,12 @@ export const authOptions: NextAuthOptions = {
             });
           }
         } catch (error) {
-          console.error('Error during sign in:', error);
+          console.error('Error during sign in:', {
+            error: error instanceof Error ? error.message : error,
+            stack: error instanceof Error ? error.stack : undefined,
+            provider: account?.provider,
+            userId: user?.id,
+          });
           return false;
         }
       }
@@ -59,7 +70,10 @@ export const authOptions: NextAuthOptions = {
             session.user.bio = dbUser.bio;
           }
         } catch (error) {
-          console.error('Error fetching user in session:', error);
+          console.error('Error fetching user in session:', {
+            error: error instanceof Error ? error.message : error,
+            tokenSub: token.sub,
+          });
         }
       }
       return session;
